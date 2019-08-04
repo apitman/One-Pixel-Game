@@ -7,6 +7,7 @@ public class PlayerMovement : MonoBehaviour
     public float runSpeed = 5f;
     public float rotationSpeed = 5f;
     public float maxXPos = 22.05f;
+    public bool controlsEnabled = true;
 
     private float horizontalMove = 0f;
     private float desiredRotation = 0f;
@@ -15,7 +16,13 @@ public class PlayerMovement : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        horizontalMove = Input.GetAxisRaw("Horizontal") * runSpeed;
+        if (controlsEnabled)
+        {
+            horizontalMove = Input.GetAxisRaw("Horizontal") * runSpeed;
+        } else
+        {
+            horizontalMove = 0f;
+        }
     }
 
     private void FixedUpdate()
@@ -30,6 +37,10 @@ public class PlayerMovement : MonoBehaviour
         float newXPos = Mathf.Min(maxXPos, transform.position.x + horizontalMove * Time.fixedDeltaTime);
         float newYPos = transform.position.y + verticalMove * Time.fixedDeltaTime;
         transform.position = new Vector3(newXPos, newYPos, transform.position.z);
+        if (newXPos >= maxXPos)
+        {
+            controlsEnabled = false;
+        }
 
         // Note: This is apparently not the right way to do rotations in general, but it works for me around 1 axis so there
         float currentRotation = transform.rotation.eulerAngles.z;
