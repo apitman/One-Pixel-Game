@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class PlayerMovement : MonoBehaviour
 {
@@ -9,6 +10,7 @@ public class PlayerMovement : MonoBehaviour
     public float maxXPos = 22.05f;
     public bool controlsEnabled = true;
     public GameObject textPrefab;
+    public float chainTextDelay = 4f;
 
     private float horizontalMove = 0f;
     private float desiredRotation = 0f;
@@ -37,8 +39,8 @@ public class PlayerMovement : MonoBehaviour
         // Text creation code
         if (playerHasMovedEver && !text1Created)
         {
-            GameObject text = Instantiate(textPrefab, new Vector3(0, 0, 0), Quaternion.identity);
-            text.transform.SetParent(GameObject.Find("Canvas").transform, false);
+            StartCoroutine(spawnText(0, "I don't belong here."));
+            StartCoroutine(spawnText(chainTextDelay, "I need to find where I belong."));
             text1Created = true;
         }
 
@@ -91,5 +93,18 @@ public class PlayerMovement : MonoBehaviour
                 desiredRotation = 0f;
             }
         }
+    }
+
+    private IEnumerator spawnText(float delay, string message, Vector3? inputLocation = null)
+    {
+        Vector3 location = inputLocation ?? Vector3.zero;
+
+        yield return new WaitForSeconds(delay);
+
+        GameObject text = Instantiate(textPrefab, location, Quaternion.identity);
+        text.transform.SetParent(GameObject.Find("Canvas").transform, false);
+        text.GetComponent<Text>().text = message;
+
+        yield return null;
     }
 }
