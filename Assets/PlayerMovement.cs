@@ -8,10 +8,13 @@ public class PlayerMovement : MonoBehaviour
     public float rotationSpeed = 5f;
     public float maxXPos = 22.05f;
     public bool controlsEnabled = true;
+    public GameObject textPrefab;
 
     private float horizontalMove = 0f;
     private float desiredRotation = 0f;
     private int activeRotations = 0;
+    private bool playerHasMovedEver = false;
+    private bool text1Created = false;
 
     // Update is called once per frame
     void Update()
@@ -19,6 +22,10 @@ public class PlayerMovement : MonoBehaviour
         if (controlsEnabled)
         {
             horizontalMove = Input.GetAxisRaw("Horizontal") * runSpeed;
+            if (horizontalMove != 0f)
+            {
+                playerHasMovedEver = true;
+            }
         } else
         {
             horizontalMove = 0f;
@@ -27,6 +34,15 @@ public class PlayerMovement : MonoBehaviour
 
     private void FixedUpdate()
     {
+        // Text creation code
+        if (playerHasMovedEver && !text1Created)
+        {
+            GameObject text = Instantiate(textPrefab, new Vector3(0, 0, 0), Quaternion.identity);
+            text.transform.SetParent(GameObject.Find("Canvas").transform, false);
+            text1Created = true;
+        }
+
+        // Movement code
         float verticalMove = 0f;
         if (activeRotations > 0)
         {
@@ -42,6 +58,7 @@ public class PlayerMovement : MonoBehaviour
             controlsEnabled = false;
         }
 
+        // Rotation code
         // Note: This is apparently not the right way to do rotations in general, but it works for me around 1 axis so there
         float currentRotation = transform.rotation.eulerAngles.z;
         float desiredRotationRemaining = desiredRotation - currentRotation;
