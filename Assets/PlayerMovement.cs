@@ -20,10 +20,12 @@ public class PlayerMovement : MonoBehaviour
     private bool playerHasMovedEver = false;
     private bool text1Created = false; // Don't @ me for these text*Created Booleans
     private bool textLeftBoundCreated = false;
+    private bool textBoringStretchCreated = false;
     private bool textHillCreated = false;
     private bool textSteeperCreated = false;
     private bool textSteepestCreated = false;
     private bool textMadeItCreated = false;
+    private bool textUpperLeftBoundCreated = false;
     private bool textDownhillCreated = false;
     private bool textColorCreated = false;
     private bool textCloseCreated = false;
@@ -31,7 +33,8 @@ public class PlayerMovement : MonoBehaviour
 
     private void Start()
     {
-        StartCoroutine(spawnText(0, "One Pixel", new Vector3(0, yOffsetForText, 0)));
+        StartCoroutine(spawnText(0, "One Pixel", 72, new Vector3(0, yOffsetForText, 0))); // TODO: Probably change the size or color here
+        controlsEnabled = false;
     }
     // Update is called once per frame
     void Update()
@@ -51,36 +54,47 @@ public class PlayerMovement : MonoBehaviour
 
     private void FixedUpdate()
     {
+        bool canShowText = FindObjectsOfType<Text>().Length == 0;
+        if (canShowText && transform.position.x < maxXPos - 1 && Time.fixedTime > 1f)
+        {
+            // Enable the controls once the title fades away
+            controlsEnabled = true;
+        }
+
         // Text creation code - I know this is all very hardcoded and hacky, but it's a 48 hour game jam and I don't have time to make it better
-        if (playerHasMovedEver && !text1Created)
+        if (canShowText && playerHasMovedEver && !text1Created)
         {
             StartCoroutine(spawnText(0, "I don't belong here."));
             StartCoroutine(spawnText(chainTextDelay, "I need to find where I belong."));
             text1Created = true;
-        } else if (!textHillCreated && desiredRotation > 0f)
+        } else if (canShowText && textLeftBoundCreated && !textBoringStretchCreated && transform.position.x > -7 && transform.position.x < -5) {
+            StartCoroutine(spawnText(0, "This empty void is so unsettling."));
+            StartCoroutine(spawnText(chainTextDelay, "I just want to go home."));
+            textBoringStretchCreated = true;
+        } else if (canShowText && !textHillCreated && desiredRotation > 0f)
         {
             StartCoroutine(spawnText(0, "A hill?"));
             textHillCreated = true;
-        } else if (textHillCreated && !textSteeperCreated && desiredRotation > 31f)
+        } else if (canShowText && textHillCreated && !textSteeperCreated && desiredRotation > 31f)
         {
             StartCoroutine(spawnText(0, "I'm not sure if I can make it."));
             textSteeperCreated = true;
         }
-        else if (textSteeperCreated && !textSteepestCreated && desiredRotation > 46f)
+        else if (canShowText && textSteeperCreated && !textSteepestCreated && desiredRotation > 46f)
         {
             StartCoroutine(spawnText(0, "So steep!"));
             textSteepestCreated = true;
         }
-        else if (textSteepestCreated && !textMadeItCreated && desiredRotation < 10f && transform.position.x > 5f)
+        else if (canShowText && textSteepestCreated && !textMadeItCreated && desiredRotation < 10f && transform.position.x > 5f)
         {
             StartCoroutine(spawnText(0, "Phew, the top flattens out."));
             textMadeItCreated = true;
         }
-        else if (textSteepestCreated && !textColorCreated && transform.position.x >= 11.5f)
+        else if (canShowText && textSteepestCreated && !textColorCreated && transform.position.x >= 11.5f && FindObjectsOfType<Text>().Length == 0)
         {
             StartCoroutine(spawnText(0, "What are these colors?"));
             textColorCreated = true;
-        } else if (textColorCreated && !textCloseCreated && transform.position.x >= 18f)
+        } else if (canShowText && textColorCreated && !textCloseCreated && transform.position.x >= 18f)
         {
             StartCoroutine(spawnText(0, "I think I'm close to where I belong."));
             textCloseCreated = true;
@@ -96,25 +110,34 @@ public class PlayerMovement : MonoBehaviour
         }
         float newXPos = Mathf.Min(maxXPos, transform.position.x + horizontalMove * Time.fixedDeltaTime);
         float newYPos = transform.position.y + verticalMove * Time.fixedDeltaTime;
-        if (newXPos <= minXPos && !textLeftBoundCreated)
+        if (newXPos <= minXPos)
         {
-            if (!textLeftBoundCreated)
+            if (canShowText && !textLeftBoundCreated)
             {
                 StartCoroutine(spawnText(0, "This direction feels wrong."));
                 StartCoroutine(spawnText(chainTextDelay, "Moving to the right feels better."));
                 textLeftBoundCreated = true;
             }
             newXPos = minXPos; // Block the player from moving any farther left
-        } else if (!textDownhillCreated && FindObjectsOfType<Text>().Length == 0 && newXPos < transform.position.x && desiredRotation > 0f)
+        } else if (canShowText && !textDownhillCreated && newXPos < transform.position.x && desiredRotation > 0f)
         {
             StartCoroutine(spawnText(0, "I can't give up."));
             textDownhillCreated = true;
+        } else if (newXPos < transform.position.x && newXPos < 5f && newYPos > 7f)
+        {
+            newXPos = transform.position.x; // Block the player from moving too far left at the top of the hill
+            if (canShowText && !textUpperLeftBoundCreated)
+            {
+                StartCoroutine(spawnText(0, "Whoa, this isn't the right way."));
+                StartCoroutine(spawnText(chainTextDelay, "I need to move right."));
+                textUpperLeftBoundCreated = true;
+            }
         }
         transform.position = new Vector3(newXPos, newYPos, transform.position.z);
         if (!textCongratulationsCreated && newXPos >= maxXPos)
         {
             controlsEnabled = false;
-            StartCoroutine(spawnText(0, "Congratulations!", new Vector3(0, yOffsetForText, 0)));
+            StartCoroutine(spawnText(0, "Congratulations!", 72, new Vector3(0, yOffsetForText, 0))); // TODO: Probably change the size or color here
             textCongratulationsCreated = true;
         }
 
@@ -153,7 +176,7 @@ public class PlayerMovement : MonoBehaviour
         }
     }
 
-    private IEnumerator spawnText(float delay, string message, Vector3? inputLocation = null)
+    private IEnumerator spawnText(float delay, string message, int size = 28, Vector3? inputLocation = null)
     {
         Vector3 location = inputLocation ?? Vector3.zero;
 
@@ -162,6 +185,7 @@ public class PlayerMovement : MonoBehaviour
         GameObject text = Instantiate(textPrefab, location, Quaternion.identity);
         text.transform.SetParent(GameObject.Find("Canvas").transform, false);
         text.GetComponent<Text>().text = message;
+        text.GetComponent<Text>().fontSize = size;
 
         yield return null;
     }
