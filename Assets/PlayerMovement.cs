@@ -6,6 +6,7 @@ public class PlayerMovement : MonoBehaviour
 {
     public float runSpeed = 5f;
     public float rotationSpeed = 5f;
+    public float maxXPos = 22.05f;
 
     private float horizontalMove = 0f;
     private float desiredRotation = 0f;
@@ -19,8 +20,16 @@ public class PlayerMovement : MonoBehaviour
 
     private void FixedUpdate()
     {
-        float newXPos = transform.position.x + horizontalMove * Time.fixedDeltaTime;
-        transform.position = new Vector3(newXPos, transform.position.y, transform.position.z);
+        float verticalMove = 0f;
+        if (activeRotations > 0)
+        {
+            float vertRatio = desiredRotation / 90f;
+            verticalMove = horizontalMove * (vertRatio);
+            horizontalMove *= 1 - vertRatio;
+        }
+        float newXPos = Mathf.Min(maxXPos, transform.position.x + horizontalMove * Time.fixedDeltaTime);
+        float newYPos = transform.position.y + verticalMove * Time.fixedDeltaTime;
+        transform.position = new Vector3(newXPos, newYPos, transform.position.z);
 
         // Note: This is apparently not the right way to do rotations in general, but it works for me around 1 axis so there
         float currentRotation = transform.rotation.eulerAngles.z;
