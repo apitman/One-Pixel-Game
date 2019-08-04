@@ -34,5 +34,9 @@ public class FadeAwayText : MonoBehaviour
             }
         }
 
+        if (currentColor.a <= 0f)
+        {
+            Destroy(this.gameObject);
+        }
     }
 }
