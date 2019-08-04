@@ -8,7 +8,7 @@ public class PlayerMovement : MonoBehaviour
     public float runSpeed = 5f;
     public float rotationSpeed = 5f;
     public float maxXPos = 22.05f;
-    public bool controlsEnabled = true;
+    public bool moveControlsEnabled = true;
     public GameObject textPrefab;
     public GameObject textPanelPrefab;
     public float chainTextDelay = 4f;
@@ -35,12 +35,12 @@ public class PlayerMovement : MonoBehaviour
     private void Start()
     {
         StartCoroutine(spawnText(0, "One Pixel", 72, false, Color.cyan, new Vector2(800, 200), new Vector3(0, yOffsetForText, 0))); // TODO: Probably change the size or color here
-        controlsEnabled = false;
+        moveControlsEnabled = false;
     }
     // Update is called once per frame
     void Update()
     {
-        if (controlsEnabled)
+        if (moveControlsEnabled)
         {
             horizontalMove = Input.GetAxisRaw("Horizontal") * runSpeed;
             if (horizontalMove != 0f)
@@ -59,7 +59,7 @@ public class PlayerMovement : MonoBehaviour
         if (canShowText && transform.position.x < maxXPos - 1 && Time.fixedTime > 1f)
         {
             // Enable the controls once the title fades away
-            controlsEnabled = true;
+            moveControlsEnabled = true;
         }
 
         // Text creation code - I know this is all very hardcoded and hacky, but it's a 48 hour game jam and I don't have time to make it better
@@ -137,7 +137,7 @@ public class PlayerMovement : MonoBehaviour
         transform.position = new Vector3(newXPos, newYPos, transform.position.z);
         if (!textCongratulationsCreated && newXPos >= maxXPos)
         {
-            controlsEnabled = false;
+            moveControlsEnabled = false;
             StartCoroutine(spawnText(0, "Congratulations!", 72, false, Color.cyan, new Vector2(1000, 200), new Vector3(10, yOffsetForText, 0))); // TODO: Probably change the size or color here
             textCongratulationsCreated = true;
         }
