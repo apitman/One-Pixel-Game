@@ -464,6 +464,8 @@ MonoBehaviour:
   controlsEnabled: 1
   textPrefab: {fileID: 3636701933163888570, guid: 676d3d9e8a9fbaa46b0ea7ebc5ea4939,
     type: 3}
+  textPanelPrefab: {fileID: 9113986774251642897, guid: 5b837dae10117104b9006b833ecfa3c7,
+    type: 3}
   chainTextDelay: 4
   minXPos: -16
   yOffsetForText: 170

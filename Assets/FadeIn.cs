@@ -9,7 +9,6 @@ public class FadeIn : MonoBehaviour
     public float fadeSpeed = 10f;
 
     private bool endMode = false;
-    private float endModeStartTime = 0f;
 
     // Update is called once per frame
     void FixedUpdate()

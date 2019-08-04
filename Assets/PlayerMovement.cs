@@ -10,6 +10,7 @@ public class PlayerMovement : MonoBehaviour
     public float maxXPos = 22.05f;
     public bool controlsEnabled = true;
     public GameObject textPrefab;
+    public GameObject textPanelPrefab;
     public float chainTextDelay = 4f;
     public float minXPos = -16f;
     public float yOffsetForText = 180f;
@@ -33,7 +34,7 @@ public class PlayerMovement : MonoBehaviour
 
     private void Start()
     {
-        StartCoroutine(spawnText(0, "One Pixel", 72, new Vector3(0, yOffsetForText, 0))); // TODO: Probably change the size or color here
+        StartCoroutine(spawnText(0, "One Pixel", 72, false, Color.cyan, new Vector2(800, 200), new Vector3(0, yOffsetForText, 0))); // TODO: Probably change the size or color here
         controlsEnabled = false;
     }
     // Update is called once per frame
@@ -64,39 +65,39 @@ public class PlayerMovement : MonoBehaviour
         // Text creation code - I know this is all very hardcoded and hacky, but it's a 48 hour game jam and I don't have time to make it better
         if (canShowText && playerHasMovedEver && !text1Created)
         {
-            StartCoroutine(spawnText(0, "I don't belong here."));
+            StartCoroutine(spawnText(0, "I don't belong here.", inputRectSizeDelta: new Vector2(300, 50)));
             StartCoroutine(spawnText(chainTextDelay, "I need to find where I belong."));
             text1Created = true;
         } else if (canShowText && textLeftBoundCreated && !textBoringStretchCreated && transform.position.x > -7 && transform.position.x < -5) {
-            StartCoroutine(spawnText(0, "This empty void is so unsettling."));
-            StartCoroutine(spawnText(chainTextDelay, "I just want to go home."));
+            StartCoroutine(spawnText(0, "This empty void is so unsettling.", inputRectSizeDelta: new Vector2(450, 50)));
+            StartCoroutine(spawnText(chainTextDelay, "I just want to go home.", inputRectSizeDelta: new Vector2(320, 50)));
             textBoringStretchCreated = true;
         } else if (canShowText && !textHillCreated && desiredRotation > 0f)
         {
-            StartCoroutine(spawnText(0, "A hill?"));
+            StartCoroutine(spawnText(0, "A hill?", inputRectSizeDelta: new Vector2(100, 50)));
             textHillCreated = true;
         } else if (canShowText && textHillCreated && !textSteeperCreated && desiredRotation > 31f)
         {
-            StartCoroutine(spawnText(0, "I'm not sure if I can make it."));
+            StartCoroutine(spawnText(0, "I'm not sure if I can make it.", inputRectSizeDelta: new Vector2(380, 50)));
             textSteeperCreated = true;
         }
         else if (canShowText && textSteeperCreated && !textSteepestCreated && desiredRotation > 46f)
         {
-            StartCoroutine(spawnText(0, "So steep!"));
+            StartCoroutine(spawnText(0, "So steep!", inputRectSizeDelta: new Vector2(150, 50)));
             textSteepestCreated = true;
         }
         else if (canShowText && textSteepestCreated && !textMadeItCreated && desiredRotation < 10f && transform.position.x > 5f)
         {
-            StartCoroutine(spawnText(0, "Phew, the top flattens out."));
+            StartCoroutine(spawnText(0, "Phew, the top flattens out.", inputRectSizeDelta: new Vector2(350, 50)));
             textMadeItCreated = true;
         }
         else if (canShowText && textSteepestCreated && !textColorCreated && transform.position.x >= 11.5f && FindObjectsOfType<Text>().Length == 0)
         {
-            StartCoroutine(spawnText(0, "What are these colors?"));
+            StartCoroutine(spawnText(0, "Have I escaped the void?", inputRectSizeDelta: new Vector2(340, 50)));
             textColorCreated = true;
         } else if (canShowText && textColorCreated && !textCloseCreated && transform.position.x >= 18f)
         {
-            StartCoroutine(spawnText(0, "I think I'm close to where I belong."));
+            StartCoroutine(spawnText(0, "I think I'm close to where I belong.", inputRectSizeDelta: new Vector2(450, 50)));
             textCloseCreated = true;
         }
 
@@ -114,14 +115,14 @@ public class PlayerMovement : MonoBehaviour
         {
             if (canShowText && !textLeftBoundCreated)
             {
-                StartCoroutine(spawnText(0, "This direction feels wrong."));
-                StartCoroutine(spawnText(chainTextDelay, "Moving to the right feels better."));
+                StartCoroutine(spawnText(0, "This direction feels wrong.", inputRectSizeDelta: new Vector2(350, 50)));
+                StartCoroutine(spawnText(chainTextDelay, "Moving to the right feels better.", inputRectSizeDelta: new Vector2(420, 50)));
                 textLeftBoundCreated = true;
             }
             newXPos = minXPos; // Block the player from moving any farther left
         } else if (canShowText && !textDownhillCreated && newXPos < transform.position.x && desiredRotation > 0f)
         {
-            StartCoroutine(spawnText(0, "I can't give up."));
+            StartCoroutine(spawnText(0, "I can't give up.", inputRectSizeDelta: new Vector2(200, 50)));
             textDownhillCreated = true;
         } else if (newXPos < transform.position.x && newXPos < 5f && newYPos > 7f)
         {
@@ -129,7 +130,7 @@ public class PlayerMovement : MonoBehaviour
             if (canShowText && !textUpperLeftBoundCreated)
             {
                 StartCoroutine(spawnText(0, "Whoa, this isn't the right way."));
-                StartCoroutine(spawnText(chainTextDelay, "I need to move right."));
+                StartCoroutine(spawnText(chainTextDelay, "I need to move right.", inputRectSizeDelta: new Vector2(300, 50)));
                 textUpperLeftBoundCreated = true;
             }
         }
@@ -137,7 +138,7 @@ public class PlayerMovement : MonoBehaviour
         if (!textCongratulationsCreated && newXPos >= maxXPos)
         {
             controlsEnabled = false;
-            StartCoroutine(spawnText(0, "Congratulations!", 72, new Vector3(0, yOffsetForText, 0))); // TODO: Probably change the size or color here
+            StartCoroutine(spawnText(0, "Congratulations!", 72, false, Color.cyan, new Vector2(1000, 200), new Vector3(10, yOffsetForText, 0))); // TODO: Probably change the size or color here
             textCongratulationsCreated = true;
         }
 
@@ -176,16 +177,33 @@ public class PlayerMovement : MonoBehaviour
         }
     }
 
-    private IEnumerator spawnText(float delay, string message, int size = 28, Vector3? inputLocation = null)
+    private IEnumerator spawnText(float delay, string message, int size = 28, bool showPanel = true, Color? inputColor = null, Vector2? inputRectSizeDelta = null, Vector3? inputLocation = null)
     {
         Vector3 location = inputLocation ?? Vector3.zero;
+        Vector2 rectSizeDelta = inputRectSizeDelta ?? new Vector2(400, 50);
+        Color color = inputColor ?? Color.black;
 
         yield return new WaitForSeconds(delay);
 
         GameObject text = Instantiate(textPrefab, location, Quaternion.identity);
         text.transform.SetParent(GameObject.Find("Canvas").transform, false);
+        text.transform.SetParent(GameObject.Find("Canvas").transform, false);
         text.GetComponent<Text>().text = message;
         text.GetComponent<Text>().fontSize = size;
+        text.GetComponent<Text>().color = color;
+        RectTransform textRect = text.GetComponent<RectTransform>();
+        textRect.sizeDelta = rectSizeDelta;
+        Debug.Log("TextRect width = " + textRect.sizeDelta.x + " and height = " + textRect.sizeDelta.y);
+        if (showPanel)
+        {
+            Debug.Log("Instantiating panel");
+            GameObject panel = Instantiate(textPanelPrefab, location, Quaternion.identity);
+            panel.transform.SetParent(GameObject.Find("Canvas").transform, false);
+            RectTransform panelRect = panel.GetComponent<RectTransform>();
+            panelRect.position = textRect.position;
+            panelRect.sizeDelta = textRect.sizeDelta;
+            text.transform.SetParent(panel.transform, false); // Re-set the text parent to be the panel, so it shows up on top of the panel
+        }
 
         yield return null;
     }
